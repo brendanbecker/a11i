@@ -1,0 +1,445 @@
+{
+  "file": "/home/becker/projects/a11i/docs/deepresearch/Observability_Landscape_Platform_Design.md",
+  "tables": [
+    {
+      "start_line": 25,
+      "end_line": 25,
+      "content": "Dynamic Context Expansion via Tools: Some agents use tools that bring back large payloads (e.g. a web search tool that returns a long document). This means the effective context the model sees can expand within the conversation. For example, an agent might have a base prompt of 500 tokens, then call a search tool and get 1000 tokens of results, which are appended and sent to the LLM \u2013 now context usage jumped to 1500. a11i should capture those dynamics. After each tool invocation, we can recalc context usage if the agent is appending the tool output. Also, track cumulative tokens consumed across the whole agent session (not just per API call). The ai.token_usage_counter can have labels like phase=prompt|completion|total to sum over a session. By comparing cumulative tokens vs. useful work done, patterns may emerge (e.g. a loop where tokens climb rapidly without new user input signals inefficiency).",
+      "num_rows": 1
+    },
+    {
+      "start_line": 229,
+      "end_line": 229,
+      "content": "[19] [20] LLM Observability with W&B and Ploomber | ploomber-draft \u2013 Weights & Biases",
+      "num_rows": 1
+    },
+    {
+      "start_line": 235,
+      "end_line": 235,
+      "content": "[34] [35] [66] [67] [69] [70] [95] LLM Observability Explained: Prevent Hallucinations, Manage Drift, Control Costs | Splunk",
+      "num_rows": 1
+    },
+    {
+      "start_line": 241,
+      "end_line": 241,
+      "content": "[48] [49] [52] [53] [54] [55] [56] [57] [58] [63] [64] [65] Semantic Conventions for GenAI agent and framework spans | OpenTelemetry",
+      "num_rows": 1
+    },
+    {
+      "start_line": 243,
+      "end_line": 243,
+      "content": "[50] [51] [62] Semantic conventions for generative AI systems | OpenTelemetry",
+      "num_rows": 1
+    }
+  ],
+  "code_blocks": [],
+  "benchmarks": [
+    {
+      "value": "100%",
+      "type": "percentage",
+      "context": "n_tokens}. Using that ensures 100% accuracy for billing calculat",
+      "line_num": 18
+    },
+    {
+      "value": "100%",
+      "type": "percentage",
+      "context": "% increases, and if it hits ~100%, the model may start dropping",
+      "line_num": 20
+    },
+    {
+      "value": "80%",
+      "type": "percentage",
+      "context": "ly start hallucinating after ~80% context usage\u201d or \u201cTool Y oft",
+      "line_num": 29
+    },
+    {
+      "value": "80%",
+      "type": "percentage",
+      "context": "or project X) and we alert at 80% and 100% of that. We could ev",
+      "line_num": 50
+    },
+    {
+      "value": "100%",
+      "type": "percentage",
+      "context": "ct X) and we alert at 80% and 100% of that. We could even cut of",
+      "line_num": 50
+    },
+    {
+      "value": "5%",
+      "type": "percentage",
+      "context": "or most web services, adding <5% latency is a common target. H",
+      "line_num": 57
+    },
+    {
+      "value": "-5%",
+      "type": "percentage",
+      "context": "t might take 200-500ms is a ~2-5% overhead \u2013 quite acceptable.",
+      "line_num": 57
+    },
+    {
+      "value": "100%",
+      "type": "percentage",
+      "context": "hits an error, sample that at 100%; otherwise maybe 10%. We shou",
+      "line_num": 63
+    },
+    {
+      "value": "10%",
+      "type": "percentage",
+      "context": "that at 100%; otherwise maybe 10%. We should expose config for",
+      "line_num": 63
+    },
+    {
+      "value": "10%",
+      "type": "percentage",
+      "context": "e DB cluster, set sampling to 10%\u201d) as part of a scalability gu",
+      "line_num": 69
+    },
+    {
+      "value": "20%",
+      "type": "percentage",
+      "context": "failure rate goes above, say, 20%, maybe the external service (",
+      "line_num": 102
+    },
+    {
+      "value": "100%",
+      "type": "percentage",
+      "context": "we see many sessions hitting 100% context usage or frequent tru",
+      "line_num": 102
+    },
+    {
+      "value": "5%",
+      "type": "percentage",
+      "context": "users thumb-down responses > 5% of the time suddenly, somethi",
+      "line_num": 102
+    },
+    {
+      "value": "20%",
+      "type": "percentage",
+      "context": "iated (like \u201cTool error rate >20% \u2013 check if the external API i",
+      "line_num": 117
+    },
+    {
+      "value": "30%",
+      "type": "percentage",
+      "context": "nd suggest changes: e.g., \u201cIn 30% of conversations about pricin",
+      "line_num": 176
+    },
+    {
+      "value": "40%",
+      "type": "percentage",
+      "context": "least point out \u201cTool X fails 40% \u2013 consider investigating its",
+      "line_num": 178
+    },
+    {
+      "value": "99.9%",
+      "type": "percentage",
+      "context": "we\u2019d commit to something like 99.9% uptime perhaps (Langfuse ente",
+      "line_num": 194
+    },
+    {
+      "value": "99.9%",
+      "type": "percentage",
+      "context": "s (Langfuse enterprise offers 99.9% uptime SLA[102]). Achieving t",
+      "line_num": 194
+    },
+    {
+      "value": "5%",
+      "type": "percentage",
+      "context": "support bots typically have <5% hallucination rate; your bot",
+      "line_num": 202
+    },
+    {
+      "value": "8%",
+      "type": "percentage",
+      "context": "lucination rate; your bot has 8%\u201d). It could provide best prac",
+      "line_num": 202
+    },
+    {
+      "value": "90%",
+      "type": "percentage",
+      "context": "API Costs and Cut Spending by 90%\nhttps://www.helicone.ai/blog/",
+      "line_num": 227
+    },
+    {
+      "value": "100% accuracy",
+      "type": "improvement",
+      "context": "n_tokens}. Using that ensures 100% accuracy for billing calculations. a11",
+      "line_num": 18
+    },
+    {
+      "value": "200-500m",
+      "type": "range",
+      "context": "r an API call that might take 200-500ms is a ~2-5% overhead \u2013 quite",
+      "line_num": 57
+    },
+    {
+      "value": "2-5",
+      "type": "range",
+      "context": "at might take 200-500ms is a ~2-5% overhead \u2013 quite acceptable.",
+      "line_num": 57
+    },
+    {
+      "value": "2-7b",
+      "type": "range",
+      "context": "ht guess based on name (\u201cllama2-7b\u201d) and apply known context len",
+      "line_num": 92
+    },
+    {
+      "value": "10ms",
+      "type": "latency",
+      "context": "proach adds minimal latency (~10ms via edge deployment) while pr",
+      "line_num": 4
+    },
+    {
+      "value": "2 s",
+      "type": "latency",
+      "context": "c\u2019s Claude uses a similar GPT-2 style BPE with some differences",
+      "line_num": 18
+    },
+    {
+      "value": "10ms",
+      "type": "latency",
+      "context": "licone claims its proxy adds ~10ms overhead on average[86], whic",
+      "line_num": 57
+    },
+    {
+      "value": "500ms",
+      "type": "latency",
+      "context": "API call that might take 200-500ms is a ~2-5% overhead \u2013 quite a",
+      "line_num": 57
+    },
+    {
+      "value": "10ms",
+      "type": "latency",
+      "context": "). In Sidecar mode, aim for <=10ms overhead on the network hop.",
+      "line_num": 57
+    },
+    {
+      "value": "200 s",
+      "type": "latency",
+      "context": "xports spans in batches (e.g. 200 spans or every 5 seconds) to re",
+      "line_num": 60
+    },
+    {
+      "value": "5 s",
+      "type": "latency",
+      "context": "ches (e.g. 200 spans or every 5 seconds) to reduce overhead per",
+      "line_num": 60
+    },
+    {
+      "value": "2 s",
+      "type": "latency",
+      "context": "APIs are HTTPS, possibly HTTP/2 streaming for OpenAI). We\u2019ll ne",
+      "line_num": 71
+    },
+    {
+      "value": "8s",
+      "type": "latency",
+      "context": "a11i should run nicely in a K8s environment (sidecar mode sug",
+      "line_num": 82
+    },
+    {
+      "value": "10 s",
+      "type": "latency",
+      "context": "e (e.g. normally finishes in <10 steps but one instance ran 100",
+      "line_num": 102
+    },
+    {
+      "value": "100 s",
+      "type": "latency",
+      "context": "10 steps but one instance ran 100 steps or took >5 minutes), trig",
+      "line_num": 102
+    },
+    {
+      "value": "3 s",
+      "type": "latency",
+      "context": "age iterations per query goes 3 standard deviations above norm,",
+      "line_num": 105
+    },
+    {
+      "value": "500ms",
+      "type": "latency",
+      "context": "urants near me\") \u2013 *tool took 500ms, returned 5 results*\n[08:30:0",
+      "line_num": 110
+    },
+    {
+      "value": "1.2s",
+      "type": "latency",
+      "context": "h Avenue...\" \u2013 *response took 1.2s, 250 tokens*\nThis kind of vis",
+      "line_num": 111
+    },
+    {
+      "value": "8s",
+      "type": "latency",
+      "context": "eploy on their infra (Docker/K8s with config for disabling mul",
+      "line_num": 152
+    },
+    {
+      "value": "8s",
+      "type": "latency",
+      "context": "tch over if one fails (or in k8s, have liveness probes to rest",
+      "line_num": 184
+    },
+    {
+      "value": "0.03",
+      "type": "score",
+      "context": "ample, OpenAI GPT-4 might be $0.03/1K prompt tokens and $0.06/1K",
+      "line_num": 43
+    },
+    {
+      "value": "0.06",
+      "type": "score",
+      "context": "e $0.03/1K prompt tokens and $0.06/1K completion tokens (dependi",
+      "line_num": 43
+    },
+    {
+      "value": "0.05",
+      "type": "score",
+      "context": "my org, treat GPT-4 price as $0.05/1K tokens instead of $0.06 be",
+      "line_num": 46
+    },
+    {
+      "value": "0.06",
+      "type": "score",
+      "context": "s $0.05/1K tokens instead of $0.06 because we have a deal\u201d. Then",
+      "line_num": 46
+    },
+    {
+      "value": "0.01",
+      "type": "score",
+      "context": "f normally each query costs <$0.01 and suddenly one costs $1 (ma",
+      "line_num": 53
+    }
+  ],
+  "key_terms": {
+    "techniques": [
+      "Aspect-Oriented",
+      "Byte-Pair",
+      "Category-Defining",
+      "Community-Driven",
+      "Full-Stack",
+      "High-Availability",
+      "LLM-Observability",
+      "Long-Term",
+      "Monkey-Patching",
+      "Multi-Model",
+      "Multi-Provider",
+      "Multi-Tenancy",
+      "Multi-Tenant",
+      "Open-Core",
+      "Open-Source",
+      "Per-Request",
+      "Pre-Built",
+      "Provider-Specific",
+      "Read-Only",
+      "Real-Time",
+      "Role-Based",
+      "Self-Hosted",
+      "Sign-On",
+      "W-B",
+      "X-Traceparent",
+      "X-Usage"
+    ],
+    "models": [
+      "Claude",
+      "GPT-2",
+      "GPT-3",
+      "GPT-4",
+      "GPT-5",
+      "all-in-one",
+      "chain-of-thought",
+      "elastic-opentelemetry-langchain",
+      "end-to-end",
+      "gen-ai-agent",
+      "implementing-llm-observability",
+      "llm-observability-tools",
+      "monitor-and-optimize",
+      "out-of-box",
+      "out-of-the",
+      "side-by-side",
+      "step-by-step",
+      "up-to-date"
+    ],
+    "acronyms": [
+      "AGPL",
+      "AI",
+      "AOP",
+      "APM",
+      "AWS",
+      "AX",
+      "BPE",
+      "BSL",
+      "CD",
+      "CI",
+      "CLA",
+      "CNCF",
+      "CPU",
+      "DB",
+      "DCO",
+      "DLP",
+      "DNS",
+      "DONE",
+      "EU",
+      "FAISS",
+      "GDPR",
+      "GPT",
+      "HA",
+      "HIPAA",
+      "HTTPS",
+      "II",
+      "JS",
+      "JSON",
+      "JSONB",
+      "KMS",
+      "LLM",
+      "LSTM",
+      "MIT",
+      "ML",
+      "MVP",
+      "NATS",
+      "NER",
+      "NGINX",
+      "NLP",
+      "OIDC",
+      "OSS",
+      "OTLP",
+      "PCI",
+      "PHI",
+      "PII",
+      "PITR",
+      "QPS",
+      "RAG",
+      "RAGAS",
+      "RBAC",
+      "README",
+      "REDACTED",
+      "REST",
+      "ROI",
+      "SAML",
+      "SCIM",
+      "SDK",
+      "SK",
+      "SLA",
+      "SOC",
+      "SQL",
+      "SRE",
+      "SSO",
+      "TGI",
+      "TLS",
+      "TSDB",
+      "UI",
+      "US",
+      "USD",
+      "XYZ",
+      "YC"
+    ]
+  },
+  "counts": {
+    "tables": 5,
+    "code_blocks": 0,
+    "benchmarks": 46,
+    "techniques": 26,
+    "models": 18,
+    "acronyms": 71
+  }
+}

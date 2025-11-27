@@ -1,0 +1,463 @@
+{
+  "file": "/home/becker/projects/a11i/docs/deepresearch/compass_artifact_wf-2ac01823-69cb-498b-80dc-a2085847932c_text_markdown.md",
+  "tables": [
+    {
+      "start_line": 37,
+      "end_line": 43,
+      "content": "| Gap | Current State | a11i Opportunity |\n|-----|---------------|------------------|\n| **Agent-native semantics** | Most platforms trace LLM calls, not agent workflows | Purpose-built span hierarchy for Think\u2192Act\u2192Observe loops |\n| **Multi-tenant cost attribution** | Basic cost tracking exists; per-user/team chargeback is rare | Granular cost attribution with enterprise chargeback workflows |\n| **OTel-native + great UX** | OTel tools have poor UX; good UX tools are proprietary | Combine open standards with polished developer experience |\n| **Self-hosted compliance** | Limited options for regulated industries | HIPAA/SOC2-ready self-hosted deployment from day one |\n| **Streaming observability** | Most platforms buffer entire responses | Real-time TTFT and token-level streaming metrics |",
+      "num_rows": 7
+    },
+    {
+      "start_line": 195,
+      "end_line": 196,
+      "content": "gen_ai.operation.name: \"invoke_agent\" | \"chat\" | \"execute_tool\"\ngen_ai.provider.name: \"openai\" | \"anthropic\" | \"aws.bedrock\"",
+      "num_rows": 2
+    },
+    {
+      "start_line": 206,
+      "end_line": 206,
+      "content": "a11i.tool.category: \"retrieval\" | \"api\" | \"computation\" | \"memory\"",
+      "num_rows": 1
+    },
+    {
+      "start_line": 310,
+      "end_line": 314,
+      "content": "| Tenant Tier | Isolation Level | Implementation |\n|-------------|-----------------|----------------|\n| Enterprise | Database per tenant | Dedicated ClickHouse cluster |\n| Business | Schema per tenant | Separate databases, shared infrastructure |\n| Self-serve | Shared with RLS | Row-level security, tenant_id in all queries |",
+      "num_rows": 5
+    },
+    {
+      "start_line": 364,
+      "end_line": 369,
+      "content": "| Metric | Target | Critical Threshold |\n|--------|--------|--------------------|\n| CPU overhead | <5% increase | >10% triggers optimization |\n| Memory overhead | <50MB static | >100MB requires review |\n| P99 latency impact | <10ms | >50ms unacceptable |\n| Network bandwidth | <5MB/s at 10k RPS | Scale with volume |",
+      "num_rows": 6
+    },
+    {
+      "start_line": 386,
+      "end_line": 390,
+      "content": "| Tier | Retention | Storage | Cost/TB/month |\n|------|-----------|---------|---------------|\n| Hot | 24-72 hours | SSD/NVMe | $100-200 |\n| Warm | 7-90 days | Standard HDD | $20-50 |\n| Cold | 1+ years | S3/Object Storage | $2-21 |",
+      "num_rows": 5
+    },
+    {
+      "start_line": 432,
+      "end_line": 439,
+      "content": "| Framework | Integration Pattern | Auto-Instrumentation | Key Hook |\n|-----------|---------------------|---------------------|----------|\n| **LangChain/LangGraph** | CallbackHandler | \u2705 Native | Callback system |\n| **Semantic Kernel** | Native OTel | \u2705 Built-in | Activity spans |\n| **AutoGen** | TracerProvider injection | \u2705 Native | Runtime telemetry |\n| **CrewAI** | Multiple options | \u2705 Via hooks | Execution callbacks |\n| **DSPy** | OpenInference | \u2705 Instrumentor | Module callbacks |\n| **Haystack** | Tracer interface | \u2705 Native | Pipeline components |",
+      "num_rows": 8
+    },
+    {
+      "start_line": 552,
+      "end_line": 557,
+      "content": "| Risk | Likelihood | Impact | Mitigation |\n|------|------------|--------|------------|\n| OTel GenAI conventions change | High | Medium | Use `OTEL_SEMCONV_STABILITY_OPT_IN`, build abstraction layer |\n| ClickHouse scaling limits | Low | High | Design for horizontal scaling from start; benchmark early |\n| Framework integration breakage | Medium | Medium | Pin versions, comprehensive integration tests |\n| PII detection false negatives | Medium | High | Multi-layer approach (regex + ML), manual review option |",
+      "num_rows": 6
+    },
+    {
+      "start_line": 561,
+      "end_line": 566,
+      "content": "| Risk | Likelihood | Impact | Mitigation |\n|------|------------|--------|------------|\n| Major APM vendor dominance | High | High | Focus on OTel portability; avoid vendor lock-in messaging |\n| Open-source competitor emerges | Medium | Medium | Build community early; move fast on differentiation |\n| LangSmith becomes \"good enough\" | Medium | High | Target non-LangChain users; emphasize multi-framework support |\n| Enterprise sales cycle length | High | Medium | Freemium model for bottom-up adoption |",
+      "num_rows": 6
+    },
+    {
+      "start_line": 570,
+      "end_line": 574,
+      "content": "| Risk | Likelihood | Impact | Mitigation |\n|------|------------|--------|------------|\n| Observability platform outage | Low | Critical | Design for graceful degradation; never block agent execution |\n| Data breach | Low | Critical | Encryption by default; security audit before launch |\n| Cost overruns at scale | Medium | Medium | Implement per-tenant quotas; alert on anomalous usage |",
+      "num_rows": 5
+    }
+  ],
+  "code_blocks": [
+    {
+      "language": "text",
+      "code": "\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                           Client Applications                            \u2502\n\u2502              (LangChain, LangGraph, AutoGen, CrewAI, etc.)              \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                                 \u2502 OTel SDK / Auto-instrumentation\n                                 \u25bc\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                        a11i Instrumentation Layer                        \u2502\n\u2502   \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510        \u2502\n\u2502   \u2502 OpenLLMetry     \u2502  \u2502 Agent Extensions\u2502  \u2502 Custom Hooks    \u2502        \u2502\n\u2502   \u2502 (LLM providers) \u2502  \u2502 (Loop tracking) \u2502  \u2502 (Framework SDKs)\u2502        \u2502\n\u2502   \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518        \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                                 \u2502 OTLP (gRPC/HTTP)\n                                 \u25bc\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                        OTel Collector Fleet                              \u2502\n\u2502   \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510        \u2502\n\u2502   \u2502 Receivers       \u2502  \u2502 Processors      \u2502  \u2502 Exporters       \u2502        \u2502\n\u2502   \u2502 (OTLP)          \u2502  \u2502 (Batch, PII,    \u2502  \u2502 (ClickHouse,    \u2502        \u2502\n\u2502   \u2502                 \u2502  \u2502  Sampling)      \u2502  \u2502  Kafka, etc.)   \u2502        \u2502\n\u2502   \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518        \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u252c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                                 \u2502\n              \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n              \u25bc                  \u25bc                  \u25bc\n     \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510    \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510    \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n     \u2502 NATS        \u2502    \u2502 ClickHouse  \u2502    \u2502 S3/Object   \u2502\n     \u2502 JetStream   \u2502    \u2502 (Hot/Warm)  \u2502    \u2502 Storage     \u2502\n     \u2502 (Real-time) \u2502    \u2502             \u2502    \u2502 (Cold)      \u2502\n     \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518    \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518    \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n              \u2502                  \u2502                  \u2502\n              \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                                 \u25bc\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                           a11i Platform                                  \u2502\n\u2502   \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510        \u2502\n\u2502   \u2502 Query Engine    \u2502  \u2502 Alerting        \u2502  \u2502 API Gateway     \u2502        \u2502\n\u2502   \u2502 & Dashboards    \u2502  \u2502 & Anomaly Det.  \u2502  \u2502 & RBAC          \u2502        \u2502\n\u2502   \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518        \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518",
+      "line_num": 79,
+      "num_lines": 42
+    },
+    {
+      "language": "sql",
+      "code": "-- ClickHouse optimized schema for agent traces\nCREATE TABLE agent_traces (\n    tenant_id LowCardinality(String),\n    trace_id FixedString(32),\n    span_id FixedString(16),\n    parent_span_id Nullable(FixedString(16)),\n    \n    -- Agent-specific fields\n    agent_name LowCardinality(String),\n    agent_id String,\n    conversation_id String,\n    loop_iteration UInt16,\n    loop_phase Enum8('think' = 1, 'act' = 2, 'observe' = 3),\n    \n    -- LLM fields\n    model LowCardinality(String),\n    provider LowCardinality(String),\n    input_tokens UInt32,\n    output_tokens UInt32,\n    cost_usd Decimal64(8),\n    \n    -- Timing\n    start_time DateTime64(3),\n    end_time DateTime64(3),\n    duration_ms UInt32,\n    ttft_ms Nullable(UInt32),  -- Time to first token\n    \n    -- Context\n    context_saturation Float32,  -- 0.0 to 1.0\n    tool_calls Array(String),\n    error_type Nullable(LowCardinality(String)),\n    \n    -- Flexible attributes\n    attributes Map(String, String)\n)\nENGINE = MergeTree()\nPARTITION BY (tenant_id, toYYYYMM(start_time))\nORDER BY (tenant_id, trace_id, start_time)\nTTL start_time + INTERVAL 30 DAY TO VOLUME 'warm',\n    start_time + INTERVAL 180 DAY TO VOLUME 'cold';",
+      "line_num": 125,
+      "num_lines": 41
+    },
+    {
+      "language": "text",
+      "code": "[Root Span: invoke_agent {agent_name}]\n\u251c\u2500\u2500 [Loop Iteration 1]\n\u2502   \u251c\u2500\u2500 [think: chat - reasoning/planning]\n\u2502   \u2502   \u2514\u2500\u2500 gen_ai.input.messages, gen_ai.output.messages\n\u2502   \u251c\u2500\u2500 [act: execute_tool {tool_name}]\n\u2502   \u2502   \u2514\u2500\u2500 Tool-specific attributes, duration\n\u2502   \u2514\u2500\u2500 [observe: chat - process results]\n\u2502       \u2514\u2500\u2500 Updated context, next action decision\n\u251c\u2500\u2500 [Loop Iteration 2]\n\u2502   \u2514\u2500\u2500 ... (continues until completion)\n\u2514\u2500\u2500 [Final: response_synthesis]\n    \u2514\u2500\u2500 Final output to user",
+      "line_num": 177,
+      "num_lines": 13
+    },
+    {
+      "language": "yaml",
+      "code": "# Required (OTel standard)\ngen_ai.operation.name: \"invoke_agent\" | \"chat\" | \"execute_tool\"\ngen_ai.provider.name: \"openai\" | \"anthropic\" | \"aws.bedrock\"\ngen_ai.request.model: \"gpt-4o\"\ngen_ai.response.model: \"gpt-4o-2024-08-06\"\n\n# Agent-specific (a11i extensions)\na11i.agent.name: \"research_assistant\"\na11i.agent.loop_iteration: 3\na11i.agent.loop_phase: \"act\"\na11i.context.saturation: 0.72  # 72% of context window used\na11i.context.tokens_remaining: 35840\na11i.tool.category: \"retrieval\" | \"api\" | \"computation\" | \"memory\"",
+      "line_num": 193,
+      "num_lines": 14
+    },
+    {
+      "language": "python",
+      "code": "async def observe_stream(llm_stream, span):\n    \"\"\"Pass-through streaming with side-channel telemetry.\"\"\"\n    ttft = None\n    tokens = []\n    start_time = time.monotonic()\n    \n    async for chunk in llm_stream:\n        if ttft is None:\n            ttft = (time.monotonic() - start_time) * 1000\n            span.add_event(\"gen_ai.first_token\", {\"ttft_ms\": ttft})\n        tokens.append(chunk)\n        yield chunk  # Pass through immediately to client\n    \n    # Async emit final telemetry (never blocks client)\n    span.set_attribute(\"gen_ai.ttft_ms\", ttft)\n    span.set_attribute(\"gen_ai.output_tokens\", len(tokens))\n    span.set_attribute(\"gen_ai.duration_ms\", (time.monotonic() - start_time) * 1000)",
+      "line_num": 213,
+      "num_lines": 18
+    },
+    {
+      "language": "python",
+      "code": "def calculate_context_metrics(\n    input_tokens: int,\n    tool_definitions_tokens: int,\n    conversation_history_tokens: int,\n    context_window: int\n) -> dict:\n    total_used = input_tokens + tool_definitions_tokens + conversation_history_tokens\n    saturation = total_used / context_window\n    \n    return {\n        \"context_saturation\": saturation,\n        \"tokens_used\": total_used,\n        \"tokens_remaining\": context_window - total_used,\n        \"at_risk\": saturation > 0.85,  # Alert threshold\n        \"critical\": saturation > 0.95,  # Hard limit approaching\n        \"breakdown\": {\n            \"input\": input_tokens,\n            \"tools\": tool_definitions_tokens,\n            \"history\": conversation_history_tokens\n        }\n    }",
+      "line_num": 243,
+      "num_lines": 22
+    },
+    {
+      "language": "yaml",
+      "code": "processors:\n  pii_redaction:\n    type: presidio\n    entities:\n      - CREDIT_CARD\n      - EMAIL_ADDRESS\n      - PHONE_NUMBER\n      - US_SSN\n      - PERSON  # Names\n    confidence_threshold: 0.8\n    action: mask  # Options: mask, remove, hash, encrypt\n    mask_character: \"*\"",
+      "line_num": 285,
+      "num_lines": 13
+    },
+    {
+      "language": "yaml",
+      "code": "# Three-tier permission hierarchy\nOrganization Level:\n  - Org Admin: Full control over all workspaces\n  - Org Billing Admin: Billing + usage only\n  - Org Member: Base access to assigned projects\n\nWorkspace Level:\n  - Workspace Admin: Full workspace control\n  - Workspace Editor: Read + write data, manage dashboards\n  - Workspace Viewer: Read-only access\n\nProject Level:\n  - Project Admin: Manage project members and settings\n  - Project Editor: Create/edit traces, alerts, dashboards\n  - Project Viewer: View traces and dashboards only\n  - Project Analyst: View + export capabilities\n\nCustom Roles (Enterprise):\n  - Security Auditor: Audit logs + security events only\n  - Data Engineer: Pipeline configuration only\n  - Support Agent: Limited read access for troubleshooting",
+      "line_num": 323,
+      "num_lines": 22
+    },
+    {
+      "language": "yaml",
+      "code": "processors:\n  tail_sampling:\n    decision_wait: 30s\n    num_traces: 50000\n    policies:\n      - name: errors-always\n        type: status_code\n        status_code: {status_codes: [ERROR]}\n      - name: slow-traces\n        type: latency\n        latency: {threshold_ms: 5000}\n      - name: long-agent-loops\n        type: numeric_attribute\n        numeric_attribute:\n          key: a11i.agent.loop_iteration\n          min_value: 5\n      - name: probabilistic-baseline\n        type: probabilistic\n        probabilistic: {sampling_percentage: 10}",
+      "line_num": 404,
+      "num_lines": 20
+    },
+    {
+      "language": "python",
+      "code": "from a11i import observe, agent_loop\n\n@observe()\ndef my_llm_function(input: str) -> str:\n    \"\"\"Automatically traces with OTel span.\"\"\"\n    return llm.invoke(input)\n\n@agent_loop(name=\"research_agent\")\nasync def research_workflow(query: str):\n    \"\"\"Tracks full agent loop with iteration counting.\"\"\"\n    while not done:\n        thought = await think(query)\n        action = await act(thought)\n        observation = await observe_result(action)",
+      "line_num": 444,
+      "num_lines": 15
+    },
+    {
+      "language": "bash",
+      "code": "# Environment variables only\nexport A11I_API_KEY=<key>\nexport A11I_PROJECT=my-agent-project\nexport OTEL_EXPORTER_OTLP_ENDPOINT=https://ingest.a11i.dev\n\n# Auto-instrumentation via CLI\na11i-instrument python app.py",
+      "line_num": 468,
+      "num_lines": 8
+    },
+    {
+      "language": "yaml",
+      "code": "model_pricing:\n  - model: gpt-4o\n    input_cost_per_token: 0.000003\n    output_cost_per_token: 0.000015\n    cache_read_discount: 0.92  # 92% cheaper for cached\n  - model: claude-sonnet-4-20250514\n    input_cost_per_token: 0.000003\n    output_cost_per_token: 0.000015\n    thinking_tokens_rate: 0.000010  # Extended thinking",
+      "line_num": 481,
+      "num_lines": 10
+    },
+    {
+      "language": "bash",
+      "code": "# Use opt-in for latest experimental conventions\nOTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_latest_experimental\n\n# Build abstraction layer for custom attributes\na11i.context.saturation  # Custom namespace for extensions",
+      "line_num": 596,
+      "num_lines": 6
+    }
+  ],
+  "benchmarks": [
+    {
+      "value": "92%",
+      "type": "percentage",
+      "context": "sk = 3.40 TiB uncompressed (**92% compression**)\n- Native OTel",
+      "line_num": 65
+    },
+    {
+      "value": "72%",
+      "type": "percentage",
+      "context": "i.context.saturation: 0.72  # 72% of context window used\na11i.c",
+      "line_num": 204
+    },
+    {
+      "value": "5%",
+      "type": "percentage",
+      "context": "ndustry benchmarks, target **<5% average response time overhea",
+      "line_num": 362
+    },
+    {
+      "value": "5%",
+      "type": "percentage",
+      "context": "----------|\n| CPU overhead | <5% increase | >10% triggers opti",
+      "line_num": 366
+    },
+    {
+      "value": "10%",
+      "type": "percentage",
+      "context": "PU overhead | <5% increase | >10% triggers optimization |\n| Mem",
+      "line_num": 366
+    },
+    {
+      "value": "70%",
+      "type": "percentage",
+      "context": "ed on CPU utilization (target 70%)\n- Load balancer with connect",
+      "line_num": 375
+    },
+    {
+      "value": "70%",
+      "type": "percentage",
+      "context": "-21 |\n\n**Savings potential**: 70%+ cost reduction if 80% of dat",
+      "line_num": 392
+    },
+    {
+      "value": "80%",
+      "type": "percentage",
+      "context": "ial**: 70%+ cost reduction if 80% of data is cold tier eligible",
+      "line_num": 392
+    },
+    {
+      "value": "-20%",
+      "type": "percentage",
+      "context": "1. **Head-based sampling**: 10-20% probabilistic for baseline vo",
+      "line_num": 397
+    },
+    {
+      "value": "92%",
+      "type": "percentage",
+      "context": "cache_read_discount: 0.92  # 92% cheaper for cached\n  - model:",
+      "line_num": 486
+    },
+    {
+      "value": "-5%",
+      "type": "percentage",
+      "context": "priority support)\n- Captures 1-5% of value created (industry st",
+      "line_num": 662
+    },
+    {
+      "value": "5% increase",
+      "type": "improvement",
+      "context": "----------|\n| CPU overhead | <5% increase | >10% triggers optimization",
+      "line_num": 366
+    },
+    {
+      "value": "50-80m",
+      "type": "range",
+      "context": "rchitectures. Helicone adds **50-80ms latency overhead** but requi",
+      "line_num": 21
+    },
+    {
+      "value": "2024-08",
+      "type": "range",
+      "context": "en_ai.response.model: \"gpt-4o-2024-08-06\"\n\n# Agent-specific (a11i e",
+      "line_num": 198
+    },
+    {
+      "value": "24-72",
+      "type": "range",
+      "context": "----|---------------|\n| Hot | 24-72 hours | SSD/NVMe | $100-200 |",
+      "line_num": 388
+    },
+    {
+      "value": "100-200",
+      "type": "range",
+      "context": "t | 24-72 hours | SSD/NVMe | $100-200 |\n| Warm | 7-90 days | Standa",
+      "line_num": 388
+    },
+    {
+      "value": "7-90",
+      "type": "range",
+      "context": "SD/NVMe | $100-200 |\n| Warm | 7-90 days | Standard HDD | $20-50",
+      "line_num": 389
+    },
+    {
+      "value": "20-50",
+      "type": "range",
+      "context": "| 7-90 days | Standard HDD | $20-50 |\n| Cold | 1+ years | S3/Obje",
+      "line_num": 389
+    },
+    {
+      "value": "2-21",
+      "type": "range",
+      "context": "years | S3/Object Storage | $2-21 |\n\n**Savings potential**: 70%",
+      "line_num": 390
+    },
+    {
+      "value": "10-20",
+      "type": "range",
+      "context": "*\n1. **Head-based sampling**: 10-20% probabilistic for baseline v",
+      "line_num": 397
+    },
+    {
+      "value": "4-20250514",
+      "type": "range",
+      "context": "ched\n  - model: claude-sonnet-4-20250514\n    input_cost_per_token: 0.0",
+      "line_num": 487
+    },
+    {
+      "value": "1-6",
+      "type": "range",
+      "context": "# Phase 1: Foundation (Months 1-6)\n- Core OTel-native tracing f",
+      "line_num": 622
+    },
+    {
+      "value": "6-12",
+      "type": "range",
+      "context": "Phase 2: Intelligence (Months 6-12)\n- Advanced agent workflow vi",
+      "line_num": 630
+    },
+    {
+      "value": "12-18",
+      "type": "range",
+      "context": "Phase 3: Optimization (Months 12-18)\n- ML-based anomaly detection",
+      "line_num": 638
+    },
+    {
+      "value": "18-24",
+      "type": "range",
+      "context": "### Phase 4: Platform (Months 18-24)\n- Plugin marketplace for cus",
+      "line_num": 646
+    },
+    {
+      "value": "1-5",
+      "type": "range",
+      "context": "priority support)\n- Captures 1-5% of value created (industry s",
+      "line_num": 662
+    },
+    {
+      "value": "80ms",
+      "type": "latency",
+      "context": "itectures. Helicone adds **50-80ms latency overhead** but requir",
+      "line_num": 21
+    },
+    {
+      "value": "3ms",
+      "type": "latency",
+      "context": "ased rate limiting, and **sub-3ms internal latency**. It suppor",
+      "line_num": 55
+    },
+    {
+      "value": "1ms",
+      "type": "latency",
+      "context": "ream** provides low latency (<1ms), lightweight operation, and",
+      "line_num": 61
+    },
+    {
+      "value": "1000\n            s",
+      "type": "latency",
+      "context": "e.monotonic() - start_time) * 1000\n            span.add_event(\"gen_ai.first_to",
+      "line_num": 222
+    },
+    {
+      "value": "10ms",
+      "type": "latency",
+      "context": "e considerations:**\n- Target <10ms overhead for real-time traces",
+      "line_num": 301
+    },
+    {
+      "value": "10ms",
+      "type": "latency",
+      "context": "iew |\n| P99 latency impact | <10ms | >50ms unacceptable |\n| Netw",
+      "line_num": 368
+    },
+    {
+      "value": "50ms",
+      "type": "latency",
+      "context": "P99 latency impact | <10ms | >50ms unacceptable |\n| Network band",
+      "line_num": 368
+    },
+    {
+      "value": "30s",
+      "type": "latency",
+      "context": "_sampling:\n    decision_wait: 30s\n    num_traces: 50000\n    pol",
+      "line_num": 407
+    },
+    {
+      "value": "0.50",
+      "type": "score",
+      "context": "oprietary. Pricing starts at $0.50/1K traces (14-day retention)",
+      "line_num": 15
+    },
+    {
+      "value": "0.72",
+      "type": "score",
+      "context": "act\"\na11i.context.saturation: 0.72  # 72% of context window used",
+      "line_num": 204
+    },
+    {
+      "value": "0.85",
+      "type": "score",
+      "context": "\"at_risk\": saturation > 0.85,  # Alert threshold\n        \"",
+      "line_num": 257
+    },
+    {
+      "value": "0.95",
+      "type": "score",
+      "context": "\"critical\": saturation > 0.95,  # Hard limit approaching",
+      "line_num": 258
+    },
+    {
+      "value": "0.92",
+      "type": "score",
+      "context": "0015\n    cache_read_discount: 0.92  # 92% cheaper for cached\n  -",
+      "line_num": 486
+    }
+  ],
+  "key_terms": {
+    "techniques": [
+      "Auto-Instrumentation",
+      "Inter-Token",
+      "OpenTelemetry-Native"
+    ],
+    "models": [
+      "best-in-class",
+      "claude-sonnet-4",
+      "end-to-end",
+      "long-agent-loops",
+      "my-agent-project",
+      "request-to-final",
+      "step-by-step"
+    ],
+    "acronyms": [
+      "AD",
+      "AGPL",
+      "AI",
+      "APM",
+      "AWS",
+      "AX",
+      "BAA",
+      "BY",
+      "CLI",
+      "CPU",
+      "CREATE",
+      "DAY",
+      "ENGINE",
+      "ERROR",
+      "EU",
+      "GA",
+      "GDPR",
+      "HA",
+      "HDD",
+      "HIPAA",
+      "II",
+      "INTERVAL",
+      "ITL",
+      "JVM",
+      "KSQL",
+      "LGTM",
+      "LLM",
+      "MCP",
+      "MIT",
+      "ML",
+      "NATS",
+      "OIDC",
+      "OK",
+      "ORDER",
+      "OTLP",
+      "PARTITION",
+      "PERSON",
+      "PII",
+      "RBAC",
+      "RLS",
+      "ROI",
+      "RPS",
+      "SAML",
+      "SCIM",
+      "SDK",
+      "SOC",
+      "SSD",
+      "SSO",
+      "TABLE",
+      "TB",
+      "TO",
+      "TPOT",
+      "TTFT",
+      "TTL",
+      "UX",
+      "VOLUME"
+    ]
+  },
+  "counts": {
+    "tables": 10,
+    "code_blocks": 13,
+    "benchmarks": 39,
+    "techniques": 3,
+    "models": 7,
+    "acronyms": 56
+  }
+}
